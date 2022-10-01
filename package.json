@@ -1,5 +1,5 @@
 {
-  "name": "discordpresencebot",
+  "name": "DiscordPoCRoleBot",
   "version": "1.0.0",
   "description": "discord presence bot",
   "main": "src/index.js",
