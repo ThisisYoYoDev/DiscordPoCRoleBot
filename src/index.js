@@ -1,4 +1,4 @@
-const { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require('discord.js');
 const { token, roleChannelId } = require('../config/config.json');
 
 const client = new Client({
@@ -21,6 +21,7 @@ const dbButton = {
     "Epitech": "1025797114644680744",
     "Epita": "1025797494405345381",
     "42": "1025797637921845270",
+    "OtherSchool": "1025828625968271441",
     "Workshop": "1025797767609724958",
     "Hackathon": "1025797841563680772",
     "Talk": "1025797806356713543",
@@ -58,7 +59,11 @@ const SchoolButton = new ActionRowBuilder()
             .setCustomId("42")
             .setLabel('42')
             .setStyle(ButtonStyle.Secondary)
-            .setEmoji('1025800766998462524')
+            .setEmoji('1025800766998462524'),
+        new ButtonBuilder()
+            .setCustomId("OtherSchool")
+            .setLabel('Other School')
+            .setStyle(ButtonStyle.Secondary),
     );
 
 const EventButton = new ActionRowBuilder()
@@ -120,6 +125,25 @@ const CategoryButton2 = new ActionRowBuilder()
             .setEmoji('1025806573018292365'),
     );
 
+const AnnouncementsEmbed = new EmbedBuilder()
+    .setTitle('Announcements **role**')
+    .setDescription('Get notified when a new event is posted!')
+    .setColor(colorChangeEveryNewClick())
+
+const SchoolEmbed = new EmbedBuilder()
+    .setTitle('School **role**')
+    .setColor(colorChangeEveryNewClick())
+
+const EventEmbed = new EmbedBuilder()
+    .setTitle('Event **role**')
+    .setDescription('Get notified when a certain type of event is posted!')
+    .setColor(colorChangeEveryNewClick())
+
+const CategoryEmbed = new EmbedBuilder()
+    .setTitle('Category **role**')
+    .setDescription('Choose the categories you want to be notified about!')
+    .setColor(colorChangeEveryNewClick())
+
 
 client.on('ready', () => {
     const channel = client.channels.cache.get(roleChannelId);
@@ -127,26 +151,53 @@ client.on('ready', () => {
     if (!channel) return console.error('The channel does not exist!');
 
     channel.send({
-        content: '**Announcements role**',
-        components: [ AnnouncementsButton ]
+        embeds: [AnnouncementsEmbed],
+        components: [AnnouncementsButton]
     });
 
     channel.send({
-        content: '**Choose your school role**',
+        embeds: [SchoolEmbed],
         components: [ SchoolButton ]
     });
 
     channel.send({
-        content: '**Choose your event role**',
+        embeds: [EventEmbed],
         components: [ EventButton ]
     });
 
     channel.send({
-        content: '**Choose your category role**',
+        embeds: [CategoryEmbed],
         components: [CategoryButton, CategoryButton2]
     });
 
 });
+
+function colorChangeEveryNewClick() {
+    // return random color in hex
+    return '#' + Math.floor(Math.random() * 16777215).toString(16);
+}
+
+async function changeColorEveryClick(interaction, button) {
+    switch (button) {
+        case "Announcements":
+            AnnouncementsEmbed.setColor(colorChangeEveryNewClick());
+            await interaction.message.edit({ embeds: [AnnouncementsEmbed] });
+            break;
+        case "Epitech": case"Epita": case "42": case "OtherSchool":
+            SchoolEmbed.setColor(colorChangeEveryNewClick());
+            await interaction.message.edit({ embeds: [SchoolEmbed] });
+            break;
+        case "Workshop": case "Hackathon": case "Talk": case "SpeedHack":
+            EventEmbed.setColor(colorChangeEveryNewClick());
+            await interaction.message.edit({ embeds: [EventEmbed] });
+            break;
+        case "Software": case "Hardware": case "Security": case "AI": case "P2P": case "AR-VR":
+            CategoryEmbed.setColor(colorChangeEveryNewClick());
+            await interaction.message.edit({ embeds: [CategoryEmbed] });
+            break;
+    }
+    console.log(interaction.message.embeds);
+}
 
 client.on('interactionCreate', async interaction => {
     if (!interaction.isButton()) return;
@@ -157,19 +208,24 @@ client.on('interactionCreate', async interaction => {
 
     if (!dbButton[button]) return;
 
-
     // find if person already has the role
     const hasRole = person.roles.cache.has(dbButton[button]);
     if (hasRole) {
         // remove the role
         await person.roles.remove(dbButton[button]);
         await interaction.reply({ content: `Removed role ${button}`, ephemeral: true });
+
+        changeColorEveryClick(interaction, button);
+
         console.log(`Removed role ${button} from ${person.user.username}`);
     }
     else {
         // add the role
         await person.roles.add(dbButton[button]);
         await interaction.reply({ content: `Added role ${button}`, ephemeral: true });
+
+        changeColorEveryClick(interaction, button);
+
         console.log(`Added role ${button} to ${person.user.username}`);
     }
 });
