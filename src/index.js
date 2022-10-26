@@ -146,29 +146,30 @@ const CategoryEmbed = new EmbedBuilder()
 
 
 client.on('ready', () => {
-    const channel = client.channels.cache.get(roleChannelId);
+    console.log(`Logged in as ${client.user.tag}!`);
+    // const channel = client.channels.cache.get(roleChannelId);
 
-    if (!channel) return console.error('The channel does not exist!');
+    // if (!channel) return console.error('The channel does not exist!');
 
-    channel.send({
-        embeds: [AnnouncementsEmbed],
-        components: [AnnouncementsButton]
-    });
+    // channel.send({
+    //     embeds: [AnnouncementsEmbed],
+    //     components: [AnnouncementsButton]
+    // });
 
-    channel.send({
-        embeds: [SchoolEmbed],
-        components: [ SchoolButton ]
-    });
+    // channel.send({
+    //     embeds: [SchoolEmbed],
+    //     components: [ SchoolButton ]
+    // });
 
-    channel.send({
-        embeds: [EventEmbed],
-        components: [ EventButton ]
-    });
+    // channel.send({
+    //     embeds: [EventEmbed],
+    //     components: [ EventButton ]
+    // });
 
-    channel.send({
-        embeds: [CategoryEmbed],
-        components: [CategoryButton, CategoryButton2]
-    });
+    // channel.send({
+    //     embeds: [CategoryEmbed],
+    //     components: [CategoryButton, CategoryButton2]
+    // });
 
 });
 
